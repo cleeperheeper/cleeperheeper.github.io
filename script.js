@@ -1,10 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -58,14 +54,6 @@ loader.load('/Shared/text.glb', function (gltf) {
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000);
 scene.add(hemiLight);
 
-const composer = new EffectComposer(renderer);
-composer.setSize(w, h);
-const renderPass = new RenderPass(scene, camera);
-const glitchPass = new GlitchPass(10);
-composer.addPass(glitchPass);
-const outputPass = new OutputPass();
-composer.addPass(outputPass);
-
 //controls.update();
 function animate() {
     if (model) {
@@ -74,6 +62,6 @@ function animate() {
     }
 
     requestAnimationFrame(animate);
-    composer.render();
+    renderer.render(scene, camera);
 }
 animate();
