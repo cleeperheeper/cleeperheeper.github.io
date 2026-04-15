@@ -5,6 +5,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { FXAAPass } from 'three/addons/postprocessing/FXAAPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -32,7 +33,7 @@ camera.position.set(0, 0, 5);
 //const controls = new OrbitControls(camera, renderer.domElement);
 
 const mat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
+    color: 0x00f0ff,
     roughness: 0,
     transmission: 0
 });
@@ -63,6 +64,8 @@ const renderPass = new RenderPass( scene, camera );
 composer.addPass( renderPass );
 const aaPass = new FXAAPass();
 composer.addPass( aaPass );
+const shaderPass = new ShaderPass( '/Shared/shader.js' );
+composer.addPass( shaderPass );
 const outputPass = new OutputPass();
 composer.addPass( outputPass );
 
