@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { FXAAPass } from 'three/addons/postprocessing/FXAAPass.js';
+import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 
 const w = window.innerWidth;
@@ -30,7 +30,7 @@ const far = 10;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.set(0, 0, 5);
 
-//const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 
 const mat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
@@ -40,7 +40,7 @@ const mat = new THREE.MeshPhysicalMaterial({
 
 const loader = new GLTFLoader();
 var model;
-loader.load('/Shared/text.glb', function (gltf) {
+loader.load('/Shared/model.glb', function (gltf) {
     model = gltf.scene;
     
     model.traverse((child) => {
@@ -56,7 +56,7 @@ loader.load('/Shared/text.glb', function (gltf) {
 // const icosphere = new THREE.Mesh(geometry, mat)
 // scene.add(icosphere)
 
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000);
+const hemiLight = new THREE.HemisphereLight(0x000000, 0xff0000, 5);
 scene.add(hemiLight);
 
 // https://thrill-project.com/archiv/coding/bitmap/ for creating new "sprites"
@@ -106,7 +106,7 @@ const asciiShader = {
             float gray = 0.3 * col.r + 0.59 * col.g + 0.11 * col.b;
 
             int n = 4096;
-            
+            /*
             if (gray > 0.0233) n = 4096;
             if (gray > 0.0465) n = 131200;
             if (gray > 0.0698) n = 4329476;
@@ -149,9 +149,9 @@ const asciiShader = {
             if (gray > 0.9302) n = 32045630;
             if (gray > 0.9535) n = 33061407;
             if (gray > 0.9767) n = 11512810;
-
+            */
             // limited character set
-            /*
+            
             if (gray > 0.2) n = 65600;    // :
 	        if (gray > 0.3) n = 163153;   // *
 	        if (gray > 0.4) n = 15255086; // o 
@@ -159,7 +159,7 @@ const asciiShader = {
 	        if (gray > 0.6) n = 15252014; // 8
 	        if (gray > 0.7) n = 13195790; // @
 	        if (gray > 0.8) n = 11512810; // #
-            */
+            
 
             vec2 p = mod(pix/8.0, 2.0) - vec2(1.0);
 
@@ -176,19 +176,19 @@ const asciiShader = {
 const composer = new EffectComposer( renderer );
 const renderPass = new RenderPass( scene, camera );
 composer.addPass( renderPass );
-const aaPass = new FXAAPass();
-composer.addPass( aaPass );
 const shaderPass = new ShaderPass( asciiShader );
 composer.addPass( shaderPass );
+const bloomPass = new BloomPass( 2, 25, .75 );
+composer.addPass( bloomPass );
 const outputPass = new OutputPass();
 composer.addPass( outputPass );
 
-//controls.update();
+controls.update();
 function animate() {
-    if (model) {
-    model.rotation.y = mouseX * -.0002;
-    model.rotation.x = mouseY * -.001;
-    }
+    //if (model) {
+    //model.rotation.y = mouseX * -.01;
+    //model.rotation.x = mouseY * -.01;
+    //}
 
     requestAnimationFrame(animate);
     composer.render();
