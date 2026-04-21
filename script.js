@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 
 const w = window.innerWidth;
@@ -56,7 +56,7 @@ loader.load('/Shared/model.glb', function (gltf) {
 // const icosphere = new THREE.Mesh(geometry, mat)
 // scene.add(icosphere)
 
-const hemiLight = new THREE.HemisphereLight(0x000000, 0xff0000, 5);
+const hemiLight = new THREE.HemisphereLight(0x000000, 0x00ff80, 5);
 scene.add(hemiLight);
 
 // https://thrill-project.com/archiv/coding/bitmap/ for creating new "sprites"
@@ -178,7 +178,7 @@ const renderPass = new RenderPass( scene, camera );
 composer.addPass( renderPass );
 const shaderPass = new ShaderPass( asciiShader );
 composer.addPass( shaderPass );
-const bloomPass = new BloomPass( 2, 25, .75 );
+const bloomPass = new UnrealBloomPass( new THREE.Vector2(1, 1), .2, 1, 0 );
 composer.addPass( bloomPass );
 const outputPass = new OutputPass();
 composer.addPass( outputPass );
