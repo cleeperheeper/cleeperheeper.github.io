@@ -6,6 +6,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -23,7 +24,7 @@ document.addEventListener('mousemove', function(event) {
 
 const scene = new THREE.Scene;
 
-const fov = 20;
+const fov = 50;
 const aspect = w / h;
 const near = 0.1;
 const far = 10;
@@ -33,19 +34,19 @@ camera.position.set(0, 0, 5);
 const controls = new OrbitControls(camera, renderer.domElement);
 
 const mat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
-    roughness: 0,
-    transmission: 0
+    //color: 0xffffff,
+    //roughness: 0,
+    //transmission: 0
 });
 
 const loader = new GLTFLoader();
 var model;
-loader.load('/Shared/model.glb', function (gltf) {
+loader.load('/shared/suzanne.glb', function (gltf) {
     model = gltf.scene;
     
     model.traverse((child) => {
         if (child.isMesh) {
-            child.material = mat;
+            //child.material = mat;
         }
     })
 
@@ -56,7 +57,18 @@ loader.load('/Shared/model.glb', function (gltf) {
 // const icosphere = new THREE.Mesh(geometry, mat)
 // scene.add(icosphere)
 
-const hemiLight = new THREE.HemisphereLight(0x000000, 0x00ff80, 5);
+const pmremGenerator = new THREE.PMREMGenerator( renderer );
+const hdriLoader = new RGBELoader()
+hdriLoader.load( '/shared/skybox.hdr', function ( texture ) {
+
+    const envMap =  pmremGenerator.fromEquirectangular( texture ).texture;
+    texture.dispose();
+    scene.environment = envMap;
+
+})
+scene.environmentIntensity = 1;
+
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
 scene.add(hemiLight);
 
 // https://thrill-project.com/archiv/coding/bitmap/ for creating new "sprites"
@@ -178,7 +190,7 @@ const renderPass = new RenderPass( scene, camera );
 composer.addPass( renderPass );
 const shaderPass = new ShaderPass( asciiShader );
 composer.addPass( shaderPass );
-const bloomPass = new UnrealBloomPass( new THREE.Vector2(1, 1), .2, 1, 0 );
+const bloomPass = new UnrealBloomPass( new THREE.Vector2(1, 1), .01, 1, 1 );
 composer.addPass( bloomPass );
 const outputPass = new OutputPass();
 composer.addPass( outputPass );
