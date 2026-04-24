@@ -27,7 +27,7 @@ const scene = new THREE.Scene;
 const fov = 50;
 const aspect = w / h;
 const near = 0.1;
-const far = 10;
+const far = 100;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.set(0, 0, 5);
 
@@ -66,9 +66,9 @@ hdriLoader.load( '/shared/skybox.hdr', function ( texture ) {
     scene.environment = envMap;
 
 })
-scene.environmentIntensity = 1;
+scene.environmentIntensity = 10;
 
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 10);
 scene.add(hemiLight);
 
 // https://thrill-project.com/archiv/coding/bitmap/ for creating new "sprites"
@@ -76,7 +76,7 @@ const asciiShader = {
 
     uniforms: {
         tDiffuse: { value: null },
-        resolution: { value: new THREE.Vector2(w, h) },
+        resolution: { value: new THREE.Vector2(w * 2, h * 2) },
         mouse: { value: new THREE.Vector4() } // optional
     },
 
