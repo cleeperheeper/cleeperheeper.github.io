@@ -24,16 +24,16 @@ document.addEventListener('mousemove', function(event) {
 
 const scene = new THREE.Scene;
 
-const fov = 50;
+const fov = 20;
 const aspect = w / h;
 const near = 0.1;
 const far = 100;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-camera.position.set(0, 0, 5);
+camera.position.set(0, 0, 15);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
-const mat = new THREE.MeshPhysicalMaterial({
+const mat = new THREE.MeshNormalMaterial({
     //color: 0xffffff,
     //roughness: 0,
     //transmission: 0
@@ -41,7 +41,7 @@ const mat = new THREE.MeshPhysicalMaterial({
 
 const loader = new GLTFLoader();
 var model;
-loader.load('/shared/suzanne.glb', function (gltf) {
+loader.load('/shared/model.glb', function (gltf) {
     model = gltf.scene;
     
     model.traverse((child) => {
@@ -71,6 +71,7 @@ scene.environmentIntensity = 10;
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 10);
 scene.add(hemiLight);
 
+// glsl ascii shader by movAX13h on shadertoy, adapted to work as a three.js shaderpass
 // https://thrill-project.com/archiv/coding/bitmap/ for creating new "sprites"
 const asciiShader = {
 
@@ -80,7 +81,7 @@ const asciiShader = {
         mouse: { value: new THREE.Vector4() } // optional
     },
 
-    vertexShader: /* glsl */`
+    vertexShader: `
         varying vec2 vUv;
         void main() {
             vUv = uv;
@@ -88,7 +89,7 @@ const asciiShader = {
         }
     `,
 
-    fragmentShader: /* glsl */`
+    fragmentShader: `
         uniform sampler2D tDiffuse;
         uniform vec2 resolution;
         uniform vec4 mouse;
@@ -190,17 +191,18 @@ const renderPass = new RenderPass( scene, camera );
 composer.addPass( renderPass );
 const shaderPass = new ShaderPass( asciiShader );
 composer.addPass( shaderPass );
-const bloomPass = new UnrealBloomPass( new THREE.Vector2(1, 1), .01, 1, 1 );
+const bloomPass = new UnrealBloomPass( new THREE.Vector2(1, 1), .0001, .1, 1 );
 composer.addPass( bloomPass );
 const outputPass = new OutputPass();
 composer.addPass( outputPass );
 
 controls.update();
 function animate() {
-    //if (model) {
+    if (model) {
     //model.rotation.y = mouseX * -.01;
     //model.rotation.x = mouseY * -.01;
-    //}
+    model.rotation.y += .01
+    }
 
     requestAnimationFrame(animate);
     composer.render();
